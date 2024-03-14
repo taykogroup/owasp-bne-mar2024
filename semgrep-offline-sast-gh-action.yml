@@ -1,0 +1,29 @@
+# Place this file in .github/workflows to see it in Github.
+name: Semgrep SAST
+
+on: workflow_dispatch
+
+jobs:
+  semgrep:
+    name: semgrep/sast
+    runs-on: ubuntu-latest
+
+    container:
+      # A Docker image with Semgrep installed. Do not change this.
+      image: semgrep/semgrep
+
+    steps:
+      # Fetch project source
+      - uses: actions/checkout@v3
+      # Run the `semgrep scan` command on the command line of the docker image.
+      # Use `scan` rather `ci` to perform an offline scan.
+      - run: semgrep scan --config=auto > semgrep.out
+
+      # Upload the output from semgrep as an artifact we can download. 
+      - name: Archive semgrep results
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: ./semgrep.out
+
+
